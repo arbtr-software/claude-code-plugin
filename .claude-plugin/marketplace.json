@@ -3,10 +3,15 @@
   "name": "arbtr",
   "description": "Architectural governance for AI coding assistants",
   "homepage": "https://arbtr.ai",
-  "repository": "https://github.com/arbtr/claude-code-plugin",
-  "plugins": {
-    "arbtr": {
-      "name": "Arbtr Architectural Governance",
+  "repository": "https://github.com/arbtr-software/claude-code-plugin",
+  "owner": {
+    "name": "Arbtr",
+    "url": "https://arbtr.ai"
+  },
+  "plugins": [
+    {
+      "name": "arbtr",
+      "displayName": "Arbtr Architectural Governance",
       "description": "Check architectural decisions before making changes, enforce team standards in real-time, and capture decisions from coding sessions.",
       "version": "1.0.0",
       "path": "plugins/arbtr",
@@ -24,5 +29,5 @@
       },
       "license": "MIT"
     }
-  }
+  ]
 }
