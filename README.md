@@ -4,7 +4,7 @@ Automatic architectural decision enforcement for AI-assisted development.
 
 ## What This Does
 
-This plugin connects [Arbtr](https://arbtr.app) to Claude Code, giving your AI coding assistant awareness of your team's architectural decisions.
+This plugin connects [Arbtr](https://arbtr.ai) to Claude Code, giving your AI coding assistant awareness of your team's architectural decisions.
 
 **On session start:** Loads your team's active decisions into context. Claude knows your standards before writing any code.
 
@@ -24,7 +24,7 @@ This plugin connects [Arbtr](https://arbtr.app) to Claude Code, giving your AI c
 
 ## Setup
 
-1. Sign up at [arbtr.app](https://arbtr.app)
+1. Sign up at [arbtr.ai](https://arbtr.ai)
 2. Create a team and add your first decisions
 3. Get your API key from Settings → API
 4. Configure the plugin:
@@ -119,7 +119,7 @@ To record these decisions, go to Arbtr and use Magic Paste to import the context
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `ARBTR_API_KEY` | Your Arbtr API key | Required |
-| `ARBTR_API_URL` | API endpoint | `https://arbtr.app/api/cli` |
+| `ARBTR_API_URL` | API endpoint | `https://arbtr.ai/api/cli` |
 | `ARBTR_DEBUG` | Enable debug logging | Unset |
 
 ### Config File
@@ -128,7 +128,7 @@ Alternatively, create `~/.config/arbtr/env`:
 
 ```bash
 ARBTR_API_KEY=your_key_here
-ARBTR_API_URL=https://arbtr.app/api/cli
+ARBTR_API_URL=https://arbtr.ai/api/cli
 ```
 
 ## MCP Tools
@@ -151,7 +151,7 @@ Use these directly in conversation:
 
 **Plugin not loading decisions:**
 - Check API key is set: `echo $ARBTR_API_KEY`
-- Verify connectivity: `curl -H "Authorization: Bearer $ARBTR_API_KEY" https://arbtr.app/api/cli/status`
+- Verify connectivity: `curl -H "Authorization: Bearer $ARBTR_API_KEY" https://arbtr.ai/api/cli/status`
 - Check repo is connected in Arbtr dashboard
 
 **Violations not triggering:**
@@ -184,8 +184,8 @@ You'll get the query/search functionality but not the automatic hooks.
 
 ## Links
 
-- [Arbtr](https://arbtr.app) — Decision tracking platform
-- [Documentation](https://docs.arbtr.app) — Full docs
+- [Arbtr](https://arbtr.ai) — Decision tracking platform
+- [Documentation](https://docs.arbtr.ai) — Full docs
 - [MCP Server](https://www.npmjs.com/package/@arbtr/mcp-server) — Standalone MCP package
 
 ## License
@@ -195,4 +195,4 @@ MIT License — see [LICENSE](LICENSE) for details.
 ## Support
 
 - Issues: [GitHub Issues](https://github.com/arbtr/claude-code-plugin/issues)
-- Email: support@arbtr.app
+- Email: support@arbtr.ai
