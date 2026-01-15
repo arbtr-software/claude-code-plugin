@@ -24,21 +24,23 @@ This plugin connects [Arbtr](https://arbtr.ai) to Claude Code, giving your AI co
 
 ## Setup
 
-1. Sign up at [arbtr.ai](https://arbtr.ai)
-2. Create a team and add your first decisions
-3. Get your API key from Settings → API
-4. Configure the plugin:
+1. Get your API key from [Arbtr Settings → MCP Integration](https://app.arbtr.ai/settings)
+
+2. Add the key to your shell profile:
 
 ```bash
-mkdir -p ~/.config/arbtr
-echo "ARBTR_API_KEY=your_key_here" > ~/.config/arbtr/env
+# For zsh (default on macOS)
+echo 'export ARBTR_API_KEY=your_key_here' >> ~/.zshrc
+source ~/.zshrc
+
+# For bash
+echo 'export ARBTR_API_KEY=your_key_here' >> ~/.bashrc
+source ~/.bashrc
 ```
 
-Or set the environment variable directly:
+3. Restart Claude Code
 
-```bash
-export ARBTR_API_KEY=your_key_here
-```
+4. Verify it works — ask Claude: "What are our architecture decisions?"
 
 ## What Gets Installed
 
@@ -121,15 +123,6 @@ To record these decisions, go to Arbtr and use Magic Paste to import the context
 | `ARBTR_API_KEY` | Your Arbtr API key   | Required                       |
 | `ARBTR_API_URL` | API endpoint         | `https://app.arbtr.ai/api/cli` |
 | `ARBTR_DEBUG`   | Enable debug logging | Unset                          |
-
-### Config File
-
-Alternatively, create `~/.config/arbtr/env`:
-
-```bash
-ARBTR_API_KEY=your_key_here
-ARBTR_API_URL=https://app.arbtr.ai/api/cli
-```
 
 ## MCP Tools
 
