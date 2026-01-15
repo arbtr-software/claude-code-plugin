@@ -16,7 +16,7 @@ This plugin connects [Arbtr](https://arbtr.ai) to Claude Code, giving your AI co
 
 ```bash
 # Add the Arbtr marketplace (one time)
-/plugin marketplace add arbtr/claude-code-plugin
+/plugin marketplace add arbtr-software/claude-code-plugin
 
 # Install the plugin
 /plugin install arbtr
@@ -212,5 +212,5 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ## Support
 
-- Issues: [GitHub Issues](https://github.com/arbtr/claude-code-plugin/issues)
+- Issues: [GitHub Issues](https://github.com/arbtr-software/claude-code-plugin/issues)
 - Email: support@arbtr.ai
