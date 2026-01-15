@@ -1,5 +1,4 @@
 {
-  "$schema": "https://claude-code-plugins.github.io/schemas/hooks.json",
   "hooks": {
     "SessionStart": [
       {
@@ -7,9 +6,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./session-start.sh",
-            "timeout": 5000,
-            "description": "Load architectural decisions and team standards into Claude's context"
+            "command": "bash -c 'script=$(find ~/.claude -path \"*/arbtr/hooks/session-start.sh\" 2>/dev/null | head -1); [ -x \"$script\" ] && \"$script\"'",
+            "timeout": 5000
           }
         ]
       }
@@ -20,9 +18,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./post-write.sh",
-            "timeout": 10000,
-            "description": "Check written code against team standards and architectural decisions"
+            "command": "bash -c 'script=$(find ~/.claude -path \"*/arbtr/hooks/post-write.sh\" 2>/dev/null | head -1); [ -x \"$script\" ] && \"$script\"'",
+            "timeout": 10000
           }
         ]
       }
@@ -33,9 +30,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./session-end.sh",
-            "timeout": 60000,
-            "description": "Analyze session transcript and suggest potential decisions to record"
+            "command": "bash -c 'script=$(find ~/.claude -path \"*/arbtr/hooks/session-end.sh\" 2>/dev/null | head -1); [ -x \"$script\" ] && \"$script\"'",
+            "timeout": 60000
           }
         ]
       }
