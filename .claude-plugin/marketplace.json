@@ -1,33 +1,23 @@
 {
-  "$schema": "https://claude-code-plugins.github.io/schemas/marketplace.json",
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "arbtr",
   "description": "Architectural governance for AI coding assistants",
-  "homepage": "https://arbtr.ai",
-  "repository": "https://github.com/arbtr-software/claude-code-plugin",
   "owner": {
     "name": "Arbtr",
-    "url": "https://arbtr.ai"
+    "email": "support@arbtr.ai"
   },
   "plugins": [
     {
       "name": "arbtr",
-      "displayName": "Arbtr Architectural Governance",
       "description": "Check architectural decisions before making changes, enforce team standards in real-time, and capture decisions from coding sessions.",
       "version": "1.0.0",
-      "path": "plugins/arbtr",
-      "keywords": [
-        "architecture",
-        "governance",
-        "decisions",
-        "standards",
-        "adr",
-        "enforcement"
-      ],
       "author": {
         "name": "Arbtr",
-        "url": "https://arbtr.ai"
+        "email": "support@arbtr.ai"
       },
-      "license": "MIT"
+      "source": "./plugins/arbtr",
+      "category": "development",
+      "tags": ["architecture", "governance", "decisions", "standards"]
     }
   ]
 }
