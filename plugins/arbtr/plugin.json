@@ -1,0 +1,80 @@
+{
+  "$schema": "https://claude-code-plugins.github.io/schemas/plugin.json",
+  "name": "arbtr",
+  "displayName": "Arbtr Architectural Governance",
+  "version": "1.0.0",
+  "description": "Integrate Arbtr's architectural governance into Claude Code. Check decisions before making changes, enforce team standards in real-time, and automatically capture decisions from coding sessions.",
+  "author": {
+    "name": "Arbtr",
+    "url": "https://arbtr.ai"
+  },
+  "repository": "https://github.com/arbtr/claude-code-plugin",
+  "license": "MIT",
+  "engines": {
+    "claude-code": ">=1.0.0"
+  },
+  "dependencies": {
+    "runtime": ["curl", "jq"]
+  },
+  "configuration": {
+    "required": [
+      {
+        "key": "ARBTR_API_KEY",
+        "description": "Your Arbtr MCP API key. Get one from your team settings at https://app.arbtr.ai",
+        "type": "secret"
+      }
+    ],
+    "optional": [
+      {
+        "key": "ARBTR_API_URL",
+        "description": "Custom API endpoint (for self-hosted instances)",
+        "type": "string",
+        "default": "https://app.arbtr.ai/api/cli"
+      },
+      {
+        "key": "ARBTR_DEBUG",
+        "description": "Enable debug logging",
+        "type": "boolean",
+        "default": false
+      }
+    ]
+  },
+  "features": {
+    "mcp": {
+      "enabled": true,
+      "config": ".mcp.json"
+    },
+    "hooks": {
+      "enabled": true,
+      "config": "hooks/hooks.json"
+    },
+    "skills": {
+      "enabled": true,
+      "directory": "skills"
+    }
+  },
+  "permissions": {
+    "allow": [
+      "mcp__arbtr__search_decisions",
+      "mcp__arbtr__get_decision",
+      "mcp__arbtr__log_choice",
+      "mcp__arbtr__get_project_context",
+      "mcp__arbtr__check_standards",
+      "mcp__arbtr__git_search_prs",
+      "mcp__arbtr__git_get_file",
+      "mcp__arbtr__git_list_directory",
+      "mcp__arbtr__git_list_repos",
+      "mcp__arbtr__git_search_code",
+      "mcp__arbtr__git_get_pr_status"
+    ]
+  },
+  "keywords": [
+    "architecture",
+    "governance",
+    "adr",
+    "decisions",
+    "standards",
+    "enforcement",
+    "compliance"
+  ]
+}

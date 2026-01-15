@@ -1,0 +1,44 @@
+{
+  "$schema": "https://claude-code-plugins.github.io/schemas/hooks.json",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./session-start.sh",
+            "timeout": 5000,
+            "description": "Load architectural decisions and team standards into Claude's context"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./post-write.sh",
+            "timeout": 10000,
+            "description": "Check written code against team standards and architectural decisions"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./session-end.sh",
+            "timeout": 60000,
+            "description": "Analyze session transcript and suggest potential decisions to record"
+          }
+        ]
+      }
+    ]
+  }
+}

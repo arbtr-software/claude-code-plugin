@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "arbtr": {
+      "url": "${ARBTR_API_URL:-https://app.arbtr.ai/api/mcp}",
+      "headers": {
+        "Authorization": "Bearer ${ARBTR_API_KEY}"
+      },
+      "description": "Arbtr - System of Record for Decisions. Search architectural decisions, check standards, and log development choices."
+    }
+  }
+}
