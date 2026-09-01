@@ -21,7 +21,7 @@ set -o pipefail
 # ============================================================================
 
 CONFIG_FILE="${HOME}/.config/arbtr/env"
-DEFAULT_API_URL="https://arbtr.com/api/cli"
+DEFAULT_API_URL="https://arbtr.ai/api/cli"
 
 TOTAL_DEADLINE=55
 EXTRACT_TIMEOUT=40

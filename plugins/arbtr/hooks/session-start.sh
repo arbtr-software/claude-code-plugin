@@ -17,7 +17,7 @@ set -o pipefail
 CACHE_DIR="${HOME}/.cache/arbtr"
 CACHE_TTL=300  # 5 minutes
 CONFIG_FILE="${HOME}/.config/arbtr/env"
-API_URL="${ARBTR_API_URL:-https://arbtr.com/api/cli}"
+API_URL="${ARBTR_API_URL:-https://arbtr.ai/api/cli}"
 
 # ============================================================================
 # HELPER FUNCTIONS
@@ -39,7 +39,7 @@ load_config() {
 
   # Environment overrides config file
   API_KEY="${ARBTR_API_KEY:-}"
-  API_URL="${ARBTR_API_URL:-https://arbtr.com/api/cli}"
+  API_URL="${ARBTR_API_URL:-https://arbtr.ai/api/cli}"
 }
 
 # Detect git remote URL

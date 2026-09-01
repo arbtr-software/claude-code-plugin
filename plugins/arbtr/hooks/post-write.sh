@@ -19,7 +19,7 @@ set -o pipefail
 # ============================================================================
 
 CONFIG_FILE="${HOME}/.config/arbtr/env"
-API_URL="${ARBTR_API_URL:-https://arbtr.com/api/cli}"
+API_URL="${ARBTR_API_URL:-https://arbtr.ai/api/cli}"
 
 # File extensions to check for standards violations
 CHECKABLE_EXTENSIONS="ts tsx js jsx py go rs java rb php"
@@ -69,7 +69,7 @@ load_config() {
   fi
 
   API_KEY="${ARBTR_API_KEY:-}"
-  API_URL="${ARBTR_API_URL:-https://arbtr.com/api/cli}"
+  API_URL="${ARBTR_API_URL:-https://arbtr.ai/api/cli}"
 }
 
 # Check if file extension is checkable for standards
