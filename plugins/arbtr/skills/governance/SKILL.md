@@ -1,6 +1,6 @@
 ---
 name: arbtr-architectural-governance
-description: Check Arbtr for architectural decisions before scaffolding features, adding npm dependencies, refactoring code, or making architectural changes. Use this skill when the user asks to add new features, install libraries, modify system architecture, or restructure code. Requires the Arbtr MCP server to be configured.
+description: Check Arbtr for architectural decisions before scaffolding features, adding npm dependencies, refactoring code, or making architectural changes, and propose new decisions when you make a significant architectural choice. Use this skill when the user asks to add new features, install libraries, modify system architecture, or restructure code. Requires the Arbtr MCP server to be configured.
 ---
 
 # Arbtr Architectural Governance
@@ -44,7 +44,8 @@ mcp__arbtr__get_decision
 
 Read the decision's:
 
-- **Status**: Is it `accepted`, `proposed`, or `deprecated`?
+- **Status**: Is it active, superseded, or archived?
+- **Proposal state**: Is it marked **unratified**? That means an agent proposed it and no teammate has accepted it yet.
 - **Context**: What problem was being solved?
 - **Conclusion**: What was decided?
 - **Arguments**: What trade-offs were considered?
@@ -80,10 +81,41 @@ Which would you prefer?
 
 ### If NO relevant decisions exist:
 
-Proceed with your work, but consider:
+Proceed with your work. If the work makes a significant architectural choice (a library, a pattern, a boundary, a data model, an infrastructure choice), record it (see below).
 
-- Should this architectural choice be recorded as a new decision?
-- Mention to the user: "I didn't find any existing decisions about [topic]. Consider recording this choice in Arbtr if it's significant."
+## Recording Decisions
+
+With a personal agent key configured, you can write to Arbtr. Proposals land in the team's acceptance queue; a teammate accepts, edits, or rejects them.
+
+### Propose a new decision
+
+```
+mcp__arbtr__propose_decision
+```
+
+- **title**: the decision as a specific noun phrase, 8 to 120 characters. Not "misc updates".
+- **context**: at least 200 characters of WHY: the problem, the alternatives you considered, and the reasons for this choice.
+- **evidence**: at least one durable artifact: a PR number, commit SHA, file path, URL, or ticket id. Evidence that names only a person is stored but graded **tribal** (a hypothesis, not an instruction).
+- **idempotency_key** (optional): a stable key for retries; a replay returns the original proposal.
+
+If the tool refuses with lint errors, fix exactly what the errors say and retry once.
+
+### If a near-duplicate exists
+
+The tool refuses and lists the near matches. Do not retry with `force: true` by default. Instead:
+
+- add what you learned to the existing decision with `mcp__arbtr__add_decision_comment`, or
+- if this really is a different decision, retry with `force: true` and say in the context why it is distinct.
+
+If a near match was **rejected** before, the tool says why. Respect that unless the user tells you otherwise.
+
+### Tell the user
+
+After a proposal, tell the user the title and that it is waiting in the acceptance queue. Do not tell them it is "decided".
+
+### Without an agent key
+
+The write tools answer that an agent key is needed. Tell the user they can run `/arbtr:setup`, and continue your work.
 
 ## Example Workflow
 
@@ -111,6 +143,7 @@ Proceed with your work, but consider:
 
 - **Always check Arbtr first** - Never skip this step for significant changes
 - **Respect accepted decisions** - They represent team consensus
-- **Proposed decisions** are still under discussion - warn but don't block
+- **Unratified decisions** (agent proposals not yet accepted) are hypotheses, not constraints - mention them, but don't block on them
+- **Your own proposals** are unratified too - do not cite them to the user as team policy
 - **Deprecated decisions** have been superseded - check what replaced them
 - **When in doubt, search** - It's better to check and find nothing than to miss a relevant decision
