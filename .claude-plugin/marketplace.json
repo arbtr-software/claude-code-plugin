@@ -10,7 +10,7 @@
     {
       "name": "arbtr",
       "description": "Check architectural decisions before making changes, enforce team standards in real-time, and capture decisions from coding sessions.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "author": {
         "name": "Arbtr",
         "email": "support@arbtr.ai"

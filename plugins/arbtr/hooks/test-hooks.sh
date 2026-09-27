@@ -127,6 +127,39 @@ unset ARBTR_AGENT_KEY
 OUTPUT=$( cd "${TMP}/repo" && echo "${HOOK_INPUT}" | timeout 60 bash "${HOOKS_DIR}/session-end.sh" 2>&1 )
 echo "${OUTPUT}" | grep -q "POTENTIAL DECISIONS DETECTED"; check "fallback: URL behavior without agent key" $?
 
+# ============================================================================
+# 4. Key resolution (config.sh) and the MCP headers helper
+# ============================================================================
+FAKE_HOME="${TMP}/home"
+mkdir -p "${FAKE_HOME}/.config/arbtr" "${TMP}/other"
+echo 'ARBTR_API_KEY=mcp_arbtr_global' > "${FAKE_HOME}/.config/arbtr/env"
+
+resolve() {  # prints "AGENT|API|READ" for dir $1, extra env in $2..
+  local dir="$1"; shift
+  ( cd "${dir}" && env -u ARBTR_API_KEY -u ARBTR_AGENT_KEY -u ARBTR_API_URL \
+      HOME="${FAKE_HOME}" "$@" bash -c \
+      'source "'"${HOOKS_DIR}"'/config.sh"; arbtr_load_config; echo "${AGENT_KEY}|${API_KEY}|${READ_KEY}"' )
+}
+
+[[ "$(resolve "${TMP}/other")" == "|mcp_arbtr_global|mcp_arbtr_global" ]]
+check "config: global file used outside a configured repo" $?
+
+[[ "$(resolve "${TMP}/other" ARBTR_AGENT_KEY=arbtr_ak_env)" == "arbtr_ak_env|mcp_arbtr_global|arbtr_ak_env" ]]
+check "config: env agent key beats global file, and is the read key" $?
+
+mkdir -p "${TMP}/repo/.arbtr"
+echo 'ARBTR_AGENT_KEY=arbtr_ak_repo' > "${TMP}/repo/.arbtr/env"
+[[ "$(resolve "${TMP}/repo" ARBTR_AGENT_KEY=arbtr_ak_env ARBTR_API_KEY=mcp_arbtr_env)" == "arbtr_ak_repo||arbtr_ak_repo" ]]
+check "config: repo .arbtr/env replaces env and global keys" $?
+
+HDR=$( cd "${TMP}/other" && env -u ARBTR_API_KEY -u ARBTR_AGENT_KEY HOME="${FAKE_HOME}" bash "${HOOKS_DIR}/mcp-headers.sh" )
+echo "${HDR}" | jq -e '.Authorization == "Bearer mcp_arbtr_global"' >/dev/null
+check "mcp-headers: prints JSON with the resolved key" $?
+
+HDR=$( cd "${TMP}/other" && env -u ARBTR_API_KEY -u ARBTR_AGENT_KEY HOME="${TMP}/nohome" bash "${HOOKS_DIR}/mcp-headers.sh" )
+[[ "${HDR}" == "{}" ]]; check "mcp-headers: prints {} when no key is configured" $?
+rm -rf "${TMP}/repo/.arbtr"
+
 echo ""
 echo "${PASS} passed, ${FAIL} failed"
 exit $(( FAIL > 0 ? 1 : 0 ))

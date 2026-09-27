@@ -16,8 +16,9 @@ set -o pipefail
 
 CACHE_DIR="${HOME}/.cache/arbtr"
 CACHE_TTL=300  # 5 minutes
-CONFIG_FILE="${HOME}/.config/arbtr/env"
-API_URL="${ARBTR_API_URL:-https://arbtr.ai/api/cli}"
+# Shared config loader (keys, per-repo .arbtr/env, API URL)
+# shellcheck source=config.sh
+source "$(dirname "${BASH_SOURCE[0]}")/config.sh"
 
 # ============================================================================
 # HELPER FUNCTIONS
@@ -29,17 +30,8 @@ log_debug() {
   fi
 }
 
-# Load configuration
 load_config() {
-  # Load from config file if exists
-  if [[ -f "${CONFIG_FILE}" ]]; then
-    # shellcheck source=/dev/null
-    source "${CONFIG_FILE}" 2>/dev/null || true
-  fi
-
-  # Environment overrides config file
-  API_KEY="${ARBTR_API_KEY:-}"
-  API_URL="${ARBTR_API_URL:-https://arbtr.ai/api/cli}"
+  arbtr_load_config
 }
 
 # Detect git remote URL
@@ -91,7 +83,7 @@ fetch_context() {
   encoded_remote=$(printf '%s' "${git_remote}" | jq -sRr @uri 2>/dev/null || echo "")
 
   curl -sS --max-time 5 \
-    -H "Authorization: Bearer ${API_KEY}" \
+    -H "Authorization: Bearer ${READ_KEY}" \
     "${API_URL}/context?git_remote=${encoded_remote}" 2>/dev/null
 }
 
@@ -103,9 +95,9 @@ main() {
   load_config
 
   # Graceful degradation if not configured
-  if [[ -z "${API_KEY}" ]]; then
-    log_debug "No ARBTR_API_KEY configured, skipping context load"
-    echo "# Arbtr: Not configured. Set ARBTR_API_KEY to enable architectural governance."
+  if [[ -z "${READ_KEY}" ]]; then
+    log_debug "No Arbtr key configured, skipping context load"
+    echo "# Arbtr: Not configured. Run /arbtr:setup to add your agent key."
     exit 0
   fi
 

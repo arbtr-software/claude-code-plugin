@@ -10,7 +10,7 @@ This plugin connects [Arbtr](https://arbtr.ai) to Claude Code, giving your AI co
 
 **While coding:** Checks written code against decisions in real-time. Violations are flagged immediately so Claude can self-correct.
 
-**On session end:** Analyzes the conversation for architectural choices that might be worth documenting. Suggests capturing them in Arbtr.
+**On session end:** Analyzes the conversation for architectural choices. With an agent key, high-confidence choices are proposed to Arbtr automatically and wait in the acceptance queue for a teammate to accept or reject. Without one, they are listed as suggestions.
 
 ## Installation
 
@@ -24,32 +24,36 @@ This plugin connects [Arbtr](https://arbtr.ai) to Claude Code, giving your AI co
 
 ## Setup
 
-1. Get your API key from [Arbtr Settings → MCP Integration](https://app.arbtr.ai/settings)
+Run `/arbtr:setup` in Claude Code, or do it by hand:
 
-2. Add the key to your shell profile:
+1. Open [Arbtr → Team settings → AI settings](https://arbtr.ai/teams/ai-settings), select your team, and in **Agent keys** create a key (type `claude-code`, a label such as `sam-laptop`). Copy it; it is shown only once.
+
+2. Store the key in a file. Pick one:
 
 ```bash
-# For zsh (default on macOS)
-echo 'export ARBTR_API_KEY=your_key_here' >> ~/.zshrc
-source ~/.zshrc
+# This repo only (run from the repo root; keep .arbtr/ in .gitignore)
+mkdir -p .arbtr && printf 'ARBTR_AGENT_KEY=%s\n' 'your_key_here' > .arbtr/env && chmod 600 .arbtr/env
 
-# For bash
-echo 'export ARBTR_API_KEY=your_key_here' >> ~/.bashrc
-source ~/.bashrc
+# All repos
+mkdir -p ~/.config/arbtr && printf 'ARBTR_AGENT_KEY=%s\n' 'your_key_here' >> ~/.config/arbtr/env && chmod 600 ~/.config/arbtr/env
 ```
+
+Do not put the agent key only in your shell profile: Claude Code removes credential variables before it runs the MCP headers helper, so the MCP tools see an agent key only when it is in one of these files.
 
 3. Restart Claude Code
 
 4. Verify it works — ask Claude: "What are our architecture decisions?"
 
+Proposals also need the team's **agent writes** setting turned on (team owner or admin).
+
 ## What Gets Installed
 
 | Component         | Purpose                                                   |
 | ----------------- | --------------------------------------------------------- |
-| MCP Server        | Query decisions, log choices, search standards            |
+| MCP Server        | Query decisions, propose decisions, add comments          |
 | SessionStart Hook | Load decisions into context automatically                 |
 | PostToolUse Hook  | Check code against standards on every write               |
-| Stop Hook         | Extract potential decisions from conversations            |
+| Stop Hook         | Propose (or suggest) decisions found in the conversation  |
 | Governance Skill  | Guides Claude to check Arbtr before architectural changes |
 
 ## How It Works
@@ -98,31 +102,41 @@ Claude then fixes the code automatically.
 
 ### Decision Capture
 
-At the end of a session where architectural choices were made, Arbtr suggests capturing them:
+At the end of a session where architectural choices were made, Arbtr extracts them. With an agent key, up to three high-confidence choices are proposed automatically, with the repo, commit, and touched files attached as evidence:
 
 ```
-=== ARBTR: POTENTIAL DECISIONS DETECTED ===
+=== ARBTR: DECISIONS PROPOSED ===
 
-The following architectural choices from this session might be worth
-recording as formal decisions in Arbtr:
+2 decision(s) proposed from this session, pending human
+acceptance in Arbtr.
+Review queue: https://arbtr.ai/acme/decisions?filter=proposed
 
-- Use custom hooks for client state management (confidence: 85%)
-- Implement API routes in app/api directory (confidence: 72%)
-
-To record these decisions, go to Arbtr and use Magic Paste to import the context.
-
-=== END SUGGESTIONS ===
+=== END ===
 ```
+
+Proposals are visible to the whole team and are labeled as unratified until a teammate accepts them. Without an agent key, the hook lists the choices as suggestions instead.
 
 ## Configuration
 
-### Environment Variables
+### Key files
 
-| Variable        | Description          | Default                        |
-| --------------- | -------------------- | ------------------------------ |
-| `ARBTR_API_KEY` | Your Arbtr API key   | Required                       |
-| `ARBTR_API_URL` | API endpoint         | `https://app.arbtr.ai/api/cli` |
-| `ARBTR_DEBUG`   | Enable debug logging | Unset                          |
+Keys are read from, highest precedence first:
+
+1. `<repo root>/.arbtr/env` — replaces the other two for this repo, so a key for one team never acts in a repo configured for another
+2. environment variables (the hooks see all of them; the MCP tools see only a legacy `ARBTR_API_KEY`, never `ARBTR_AGENT_KEY`)
+3. `~/.config/arbtr/env`
+
+### Variables
+
+| Variable          | Description                                   | Default                    |
+| ----------------- | --------------------------------------------- | -------------------------- |
+| `ARBTR_AGENT_KEY` | Your personal agent key (`arbtr_ak_...`)      | Required                   |
+| `ARBTR_API_KEY`   | Legacy read-only team key (`mcp_arbtr_...`)   | Unset                      |
+| `ARBTR_API_URL`   | CLI API base used by the hooks                | `https://arbtr.ai/api/cli` |
+| `ARBTR_MCP_URL`   | MCP endpoint (shell variable only)            | `https://arbtr.ai/api/mcp` |
+| `ARBTR_DEBUG`     | Enable debug logging                          | Unset                      |
+
+When both keys are set, the agent key is used for everything: it carries your identity, so group-restricted decisions are filtered correctly.
 
 ## MCP Tools
 
@@ -134,6 +148,8 @@ The plugin includes an MCP server with these tools:
 | --------------------- | ------------------------------------------------- |
 | `search_decisions`    | Search decisions by keyword or topic              |
 | `get_decision`        | Get full details of a specific decision           |
+| `propose_decision`    | Propose a decision for teammates to accept (agent key) |
+| `add_decision_comment`| Comment on an existing decision (agent key)       |
 | `log_choice`          | Record an architectural choice made during coding |
 | `get_project_context` | Get all decisions relevant to current repo        |
 | `check_standards`     | Validate a proposed choice against team standards |
@@ -159,8 +175,8 @@ Use these directly in conversation:
 
 **Plugin not loading decisions:**
 
-- Check API key is set: `echo $ARBTR_API_KEY`
-- Verify connectivity: `curl -H "Authorization: Bearer $ARBTR_API_KEY" https://app.arbtr.ai/api/cli/status`
+- Run `/arbtr:setup`; step 1 shows which key file applies and step 5 checks the key against the server
+- Or by hand: `( source ~/.config/arbtr/env; curl -s -H "Authorization: Bearer $ARBTR_AGENT_KEY" https://arbtr.ai/api/cli/status )`
 - Check repo is connected in Arbtr dashboard
 
 **Violations not triggering:**
@@ -178,7 +194,7 @@ Then check stderr output during Claude Code sessions.
 
 ## Requirements
 
-- Claude Code 1.0.50+
+- A Claude Code version that supports `headersHelper` for MCP servers (tested with 2.1.283)
 - `curl` and `jq` installed
 - Arbtr account with API access
 

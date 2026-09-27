@@ -6,8 +6,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'script=$(find ~/.claude -path \"*/arbtr/hooks/session-start.sh\" 2>/dev/null | head -1); [ -x \"$script\" ] && \"$script\"'",
-            "timeout": 5000
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh\"",
+            "timeout": 10
           }
         ]
       }
@@ -18,8 +18,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'script=$(find ~/.claude -path \"*/arbtr/hooks/post-write.sh\" 2>/dev/null | head -1); [ -x \"$script\" ] && \"$script\"'",
-            "timeout": 10000
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/post-write.sh\"",
+            "timeout": 15
           }
         ]
       }
@@ -30,8 +30,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'script=$(find ~/.claude -path \"*/arbtr/hooks/session-end.sh\" 2>/dev/null | head -1); [ -x \"$script\" ] && \"$script\"'",
-            "timeout": 60000
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/session-end.sh\"",
+            "timeout": 60
           }
         ]
       }

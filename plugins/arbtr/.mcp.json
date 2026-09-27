@@ -2,10 +2,11 @@
   "mcpServers": {
     "arbtr": {
       "type": "http",
-      "url": "${ARBTR_API_URL:-https://arbtr.ai/api/mcp}",
+      "url": "${ARBTR_MCP_URL:-https://arbtr.ai/api/mcp}",
       "headers": {
-        "Authorization": "Bearer ${ARBTR_API_KEY}"
-      }
+        "Authorization": "Bearer ${ARBTR_API_KEY:-}"
+      },
+      "headersHelper": "${CLAUDE_PLUGIN_ROOT}/hooks/mcp-headers.sh"
     }
   }
 }

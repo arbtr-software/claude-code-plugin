@@ -20,8 +20,9 @@ set -o pipefail
 # CONFIGURATION
 # ============================================================================
 
-CONFIG_FILE="${HOME}/.config/arbtr/env"
-DEFAULT_API_URL="https://arbtr.ai/api/cli"
+# Shared config loader (keys, per-repo .arbtr/env, API URL)
+# shellcheck source=config.sh
+source "$(dirname "${BASH_SOURCE[0]}")/config.sh"
 
 TOTAL_DEADLINE=55
 EXTRACT_TIMEOUT=40
@@ -45,36 +46,8 @@ elapsed() {
   echo $(( $(date +%s) - START_TIME ))
 }
 
-# Load configuration. Precedence for each value:
-#   1. environment variable
-#   2. repo-level .arbtr/env (so one global key never proposes repo B's
-#      decisions into repo A's team)
-#   3. global ~/.config/arbtr/env
 load_config() {
-  local env_api_key="${ARBTR_API_KEY:-}"
-  local env_agent_key="${ARBTR_AGENT_KEY:-}"
-  local env_api_url="${ARBTR_API_URL:-}"
-
-  local repo_root
-  repo_root=$(git rev-parse --show-toplevel 2>/dev/null || true)
-
-  if [[ -f "${CONFIG_FILE}" ]]; then
-    # shellcheck source=/dev/null
-    source "${CONFIG_FILE}" 2>/dev/null || true
-  fi
-  if [[ -n "${repo_root}" && -f "${repo_root}/.arbtr/env" ]]; then
-    # shellcheck source=/dev/null
-    source "${repo_root}/.arbtr/env" 2>/dev/null || true
-  fi
-
-  # Environment always wins
-  [[ -n "${env_api_key}" ]] && ARBTR_API_KEY="${env_api_key}"
-  [[ -n "${env_agent_key}" ]] && ARBTR_AGENT_KEY="${env_agent_key}"
-  [[ -n "${env_api_url}" ]] && ARBTR_API_URL="${env_api_url}"
-
-  API_KEY="${ARBTR_API_KEY:-}"
-  AGENT_KEY="${ARBTR_AGENT_KEY:-}"
-  API_URL="${ARBTR_API_URL:-${DEFAULT_API_URL}}"
+  arbtr_load_config
 }
 
 # Durable evidence from the working tree: remote, HEAD sha, touched files.
@@ -129,12 +102,10 @@ main() {
 
   load_config
 
-  if [[ -z "${API_KEY}" && -z "${AGENT_KEY}" ]]; then
+  if [[ -z "${READ_KEY}" ]]; then
     log_debug "No API key configured"
     exit 0
   fi
-  # Reads (extract) accept either key type
-  local read_key="${API_KEY:-${AGENT_KEY}}"
 
   if ! command -v curl &>/dev/null; then
     log_debug "curl not available"
@@ -156,7 +127,7 @@ main() {
   local response
   response=$(curl -sS --max-time "${EXTRACT_TIMEOUT}" \
     -X POST \
-    -H "Authorization: Bearer ${read_key}" \
+    -H "Authorization: Bearer ${READ_KEY}" \
     -H "Content-Type: application/json" \
     -d "${request_body}" \
     "${API_URL}/extract" 2>/dev/null)

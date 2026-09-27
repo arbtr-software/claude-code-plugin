@@ -18,8 +18,9 @@ set -o pipefail
 # CONFIGURATION
 # ============================================================================
 
-CONFIG_FILE="${HOME}/.config/arbtr/env"
-API_URL="${ARBTR_API_URL:-https://arbtr.ai/api/cli}"
+# Shared config loader (keys, per-repo .arbtr/env, API URL)
+# shellcheck source=config.sh
+source "$(dirname "${BASH_SOURCE[0]}")/config.sh"
 
 # File extensions to check for standards violations
 CHECKABLE_EXTENSIONS="ts tsx js jsx py go rs java rb php"
@@ -61,15 +62,8 @@ log_error_to_file() {
   fi
 }
 
-# Load configuration
 load_config() {
-  if [[ -f "${CONFIG_FILE}" ]]; then
-    # shellcheck source=/dev/null
-    source "${CONFIG_FILE}" 2>/dev/null || true
-  fi
-
-  API_KEY="${ARBTR_API_KEY:-}"
-  API_URL="${ARBTR_API_URL:-https://arbtr.ai/api/cli}"
+  arbtr_load_config
 }
 
 # Check if file extension is checkable for standards
@@ -134,7 +128,7 @@ detect_and_log_imports() {
   (
     local exit_code=0
     local output
-    output=$(node "${helper_script}" "${file_path}" "${content}" "${API_URL}" "${API_KEY}" 2>&1) || exit_code=$?
+    output=$(node "${helper_script}" "${file_path}" "${content}" "${API_URL}" "${READ_KEY}" 2>&1) || exit_code=$?
 
     # Log output for debugging (stderr only when debug enabled)
     if [[ -n "${output}" ]]; then
@@ -199,7 +193,7 @@ main() {
   load_config
 
   # Skip if not configured
-  if [[ -z "${API_KEY}" ]]; then
+  if [[ -z "${READ_KEY}" ]]; then
     log_debug "No API key configured"
     exit 0
   fi
@@ -233,7 +227,7 @@ main() {
   local response
   response=$(curl -sS --max-time 10 \
     -X POST \
-    -H "Authorization: Bearer ${API_KEY}" \
+    -H "Authorization: Bearer ${READ_KEY}" \
     -H "Content-Type: application/json" \
     -d "${request_body}" \
     "${API_URL}/check" 2>/dev/null)
