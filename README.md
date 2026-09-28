@@ -154,6 +154,19 @@ The plugin includes an MCP server with these tools:
 | `get_project_context` | Get all decisions relevant to current repo        |
 | `check_standards`     | Validate a proposed choice against team standards |
 
+### Graph Organization (agent key)
+
+| Tool                   | Description                                                    |
+| ----------------------- | --------------------------------------------------------------- |
+| `get_graph_structure`  | Read the team's domains, decisions, relationships, and layout hints |
+| `create_domain`        | Create a domain (a named group of decisions)                   |
+| `rename_domain`        | Rename a domain an agent or the curator created                |
+| `assign_domain`        | Move decisions into a domain, or to the Landing Zone            |
+| `link_decisions`       | Add a relationship between two decisions                        |
+| `unlink_decisions`     | Remove a relationship an agent or the curator created            |
+| `set_layout_hint`      | Guide the graph layout (domain order, grouping, emphasis)        |
+| `clear_layout_hint`    | Remove a layout hint                                            |
+
 ### Git Integration
 
 | Tool                 | Description                               |

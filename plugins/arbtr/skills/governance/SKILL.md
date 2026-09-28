@@ -117,6 +117,19 @@ After a proposal, tell the user the title and that it is waiting in the acceptan
 
 The write tools answer that an agent key is needed. Tell the user they can run `/arbtr:setup`, and continue your work.
 
+## Organizing the Graph
+
+When you propose a decision, place it:
+
+1. Call `mcp__arbtr__get_graph_structure` once per session to see the domains and decisions.
+2. Pass `domain` (an existing domain name) to `propose_decision`. If no domain fits and the work clearly starts a new area, call `mcp__arbtr__create_domain` first. Do not create near-duplicates of existing domains.
+3. Pass `relates_to` for decisions this one depends on, conflicts with, enables, constrains, or is derived from — only when the session showed the relationship.
+
+Rules:
+- Agents cannot move decisions that a person placed or pinned, or change structure a person created. If a tool says so, leave it.
+- Use `mcp__arbtr__set_layout_hint` sparingly: `domain_rank` to order domains, `emphasize` for foundational decisions.
+- Every change you make is listed for the team and can be undone.
+
 ## Example Workflow
 
 **User**: "Add moment.js to handle date formatting in the dashboard"
